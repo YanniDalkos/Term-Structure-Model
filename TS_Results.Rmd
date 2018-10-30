@@ -1,0 +1,129 @@
+---
+title: "Term Structure Results"
+author: "Yanni Dalkos"
+date: "October 30, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# write.csv(df, file = "TermDataMulaBaby.csv")
+rm(list=ls())
+
+# Be sure to set the working directory 
+df <- read.csv("TermDataMulaBaby.csv")
+df$date <- as.Date(df$date)
+```
+
+
+```{r }
+From53to89 = df[which(df$date >= "1953-04-01" & df$date <= "1989-04-01"),]
+
+
+mod5 <- lm(GNPannGrowth15~TS5sec, data = From53to89)
+summary(mod5)
+
+mod10 <- lm(GNPannGrowth15~TS10sec, data = From53to89)
+summary(mod10)
+
+```
+
+```{r }
+library(sandwich)
+library(lmtest)
+
+mod10 <- lm(GNPannGrowth15~TS10sec, data = From53to89)
+summary(mod10)
+
+coeftest(mod5,vcov=NeweyWest)
+coeftest(mod10,vcov=NeweyWest)
+
+## Newey & West (1994) compute this type of estimator
+VCV1 <- NeweyWest(mod10);VCV1
+
+## The Newey & West (1987) estimator requires specification
+## of the lag and suppression of prewhitening
+VCV2 <- NeweyWest(mod10, lag = 1, prewhite = FALSE);VCV2
+
+coeftest(mod10,vcov. = VCV1)
+```
+
+
+```{r }
+From66to89 = df[which(df$date >= "1966-01-01" & df$date <= "1989-04-01"),]
+
+
+mod5 <- lm(GNPannGrowth15~TS5sec, data = From66to89)
+summary(mod5)
+
+mod10 <- lm(GNPannGrowth15~TS10sec, data = From66to89)
+summary(mod10)
+
+
+coeftest(mod5,vcov=NeweyWest)
+coeftest(mod10,vcov=NeweyWest)
+
+```
+
+```{r }
+From76to89 = df[which(df$date >= "1976-01-01" & df$date <= "1989-04-01"),]
+
+mod5 <- lm(GNPannGrowth15~TS5sec, data = From76to89)
+summary(mod5)
+
+mod10 <- lm(GNPannGrowth15~TS10sec, data = From76to89)
+summary(mod10)
+
+coeftest(mod5,vcov=NeweyWest)
+coeftest(mod10,vcov=NeweyWest)
+```
+
+```{r }
+
+plot(df$GNPannGrowth15~df$date, main = "GNP growth & Lagged Ten-Year Term Structure", type = "l", col = "navy", lwd = "3")
+lines(cbind(df$date, df$TS10sec), col="dark grey", lwd = "2", lty = "dashed")
+
+plot(From53to89$GNPannGrowth15~From53to89$date, main = "GNP growth & Lagged Ten-Year Term Structure", type = "l", col = "navy", lwd = "3",xlab="Year", ylab=" ")
+lines(cbind(From53to89$date, From53to89$TS10sec), col="dark grey", lwd = "2", lty = "dashed")
+```
+
+```{r }
+plot.ts(mod10$residuals)
+acf(mod10$residuals)
+
+lag1.plot(mod10$residuals, 6)
+
+```
+
+```{r }
+From99to15 = df[which(df$date >= "1999-10-01"),]
+
+mod5 <- lm(GNPannGrowth15~TS5, data = From99to15)
+summary(mod5)
+
+mod10 <- lm(GNPannGrowth15~TS10, data = From99to15)
+summary(mod10)
+
+coeftest(mod5,vcov=NeweyWest)
+coeftest(mod10,vcov=NeweyWest)
+
+```
+
+```{r }
+From05to15 = df[which(df$date >= "2005-1-01"),]
+
+
+mod5 <- lm(GNPannGrowth15~TS5, data = From05to15)
+summary(mod5)
+
+mod10 <- lm(GNPannGrowth15~TS10, data = From05to15)
+summary(mod10)
+
+```
+
+
+
+
+
+
+
